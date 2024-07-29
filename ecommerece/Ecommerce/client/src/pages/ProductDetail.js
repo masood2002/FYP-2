@@ -1,41 +1,56 @@
-import React, { useEffect, useState } from 'react'
-import Layout from '../components/Layout/Layout'
-import axios from 'axios'
-import { useNavigate, useParams } from 'react-router-dom'
+import React, { useEffect, useState } from "react";
+import Layout from "../components/Layout/Layout";
+import axios from "axios";
+import { useNavigate, useParams } from "react-router-dom";
+import { useCart } from "../context/cart";
+import "../styles/ProductDetails.css";
 
-import "../styles/ProductDetails.css"
+import toast from "react-hot-toast";
 
 const ProductDetail = () => {
-    const params=useParams()
-    const [product,setproduct]=useState({})
-    const navigate=useNavigate()
-    const [relatedProducts, setRelatedProducts] = useState([]);
-    const getproduct=async()=>{
-        try {
-            const {data}=await axios.get(`/api/v1/product/get-product/${params.slug}`)
-            setproduct(data?.product)
-            getSimilarProduct(data?.product._id,data?.product.category._id)
-        } catch (error) {
-            console.log(error);
+  const params = useParams();
+  const [product, setProduct] = useState({});
+  const navigate = useNavigate();
+  const [relatedProducts, setRelatedProducts] = useState([]);
 
-        }
+  const [cart, setCart] = useCart();
+
+  const getProduct = async () => {
+    try {
+      const { data } = await axios.get(
+        `/api/v1/product/get-product/${params.slug}`
+      );
+      setProduct(data?.product);
+      getSimilarProduct(data?.product._id, data?.product.category._id);
+    } catch (error) {
+      console.log(error);
     }
+  };
 
-    const getSimilarProduct=async(pid,cid)=>{
-        try {
-            const {data}=await axios.get(`/api/v1/product/related-product/${pid}/${cid}`)
-            setRelatedProducts(data?.products)
-                       } catch (error) {
-            console.log(error);
-        }
+  const onAddToCart = () => {
+    setCart([...cart, product]);
+    localStorage.setItem("cart", JSON.stringify([...cart, product]));
+    toast.success("Item Added to Cart");
+  };
+
+  const getSimilarProduct = async (pid, cid) => {
+    try {
+      const { data } = await axios.get(
+        `/api/v1/product/related-product/${pid}/${cid}`
+      );
+      setRelatedProducts(data?.products);
+    } catch (error) {
+      console.log(error);
     }
+  };
 
-    useEffect(()=>{
-        if(params?.slug) getproduct()
-    },[params?.slug])
+  useEffect(() => {
+    if (params?.slug) getProduct();
+  }, [params?.slug]);
+
   return (
-   <Layout>
-   <div className="row container product-details mt-5">
+    <Layout>
+      <div className="row container product-details mt-5">
         <div className="col-md-6">
           <img
             src={`/api/v1/product/product-photo/${product._id}`}
@@ -48,17 +63,24 @@ const ProductDetail = () => {
         <div className="col-md-6 product-details-info">
           <h1 className="text-center">Product Details</h1>
           <hr />
-          <h6>Name : {product.name}</h6>
-          <h6>Description : {product.description}</h6>
+          <h6>Name: {product.name}</h6>
+          <h6>Description: {product.description}</h6>
           <h6>
-            Price :
+            Price:{" "}
             {product?.price?.toLocaleString("en-US", {
               style: "currency",
               currency: "USD",
             })}
           </h6>
-          <h6>Category : {product?.category?.name}</h6>
-          <button class="btn btn-secondary ms-1">ADD TO CART</button>
+          <h6>Category: {product?.category?.name}</h6>
+          {product?.attributes?.map((attr, index) => (
+            <h6 key={index}>
+              {attr.key}: {attr.values.join(", ")}
+            </h6>
+          ))}
+          <button className="btn btn-secondary ms-1" onClick={onAddToCart}>
+            ADD TO CART
+          </button>
         </div>
       </div>
       <hr />
@@ -114,8 +136,8 @@ const ProductDetail = () => {
           ))}
         </div>
       </div>
-   </Layout>
-  )
-}
+    </Layout>
+  );
+};
 
-export default ProductDetail
+export default ProductDetail;
