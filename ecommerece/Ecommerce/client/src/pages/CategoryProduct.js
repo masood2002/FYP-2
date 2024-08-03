@@ -18,9 +18,9 @@ const CategoryProduct = () => {
       const { data } = await axios.get(
         `/api/v1/product/product-category/${params.slug}`
       );
-      
+
       setProducts(data?.product);
-    
+
       setCategory(data?.category);
     } catch (error) {
       console.log(error);

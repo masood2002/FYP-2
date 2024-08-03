@@ -5,6 +5,7 @@
 // import axios from "axios";
 // import { useNavigate } from "react-router-dom";
 // import { Select } from "antd";
+// import { CloseOutlined } from "@ant-design/icons";
 
 // const { Option } = Select;
 
@@ -18,7 +19,9 @@
 //   const [quantity, setQuantity] = useState("");
 //   const [price, setPrice] = useState("");
 //   const [shipping, setShipping] = useState("");
-//   const [attributes, setAttributes] = useState([{ key: "", value: "" }]);
+//   const [attributes, setAttributes] = useState([
+//     { key: "", values: [{ value: "", price: "" }] },
+//   ]);
 
 //   const getAllCategory = async () => {
 //     try {
@@ -45,11 +48,6 @@
 //       productData.append("shipping", shipping);
 //       productData.append("attributes", JSON.stringify(attributes));
 
-//       // Log product data to verify the attributes array
-//       for (let pair of productData.entries()) {
-//         console.log(pair[0] + ", " + pair[1]);
-//       }
-
 //       const { data } = await axios.post(
 //         "/api/v1/product/create-product",
 //         productData
@@ -66,14 +64,52 @@
 //     }
 //   };
 
-//   const handleAttributeChange = (index, key, value) => {
+//   const handleAttributeChange = (
+//     attrIndex,
+//     key,
+//     valueIndex,
+//     value,
+//     price = null
+//   ) => {
 //     const newAttributes = [...attributes];
-//     newAttributes[index][key] = value;
+//     if (key === "key") {
+//       newAttributes[attrIndex].key = value;
+//     } else {
+//       if (price !== null) {
+//         newAttributes[attrIndex].values[valueIndex].price = price;
+//       } else {
+//         newAttributes[attrIndex].values[valueIndex].value = value;
+//       }
+//     }
 //     setAttributes(newAttributes);
 //   };
 
 //   const addAttributeField = () => {
-//     setAttributes([...attributes, { key: "", value: "" }]);
+//     setAttributes([
+//       ...attributes,
+//       { key: "", values: [{ value: "", price: "" }] },
+//     ]);
+//   };
+
+//   const addValueField = (index) => {
+//     const newAttributes = [...attributes];
+//     newAttributes[index].values.push({ value: "", price: "" });
+//     setAttributes(newAttributes);
+//   };
+
+//   const deleteAttributeField = (attrIndex) => {
+//     const newAttributes = [...attributes];
+//     newAttributes.splice(attrIndex, 1);
+//     setAttributes(newAttributes);
+//   };
+
+//   const deleteValueField = (attrIndex, valueIndex) => {
+//     const newAttributes = [...attributes];
+//     newAttributes[attrIndex].values.splice(valueIndex, 1);
+//     if (newAttributes[attrIndex].values.length === 0) {
+//       newAttributes[attrIndex].values.push({ value: "", price: "" });
+//     }
+//     setAttributes(newAttributes);
 //   };
 
 //   useEffect(() => {
@@ -177,26 +213,83 @@
 //               </Select>
 //               <div className="mb-3">
 //                 <h4>Product Attributes</h4>
-//                 {attributes.map((attr, index) => (
-//                   <div key={index} className="d-flex mb-2">
-//                     <input
-//                       type="text"
-//                       value={attr.key}
-//                       placeholder="Key"
-//                       className="form-control mr-2"
-//                       onChange={(e) =>
-//                         handleAttributeChange(index, "key", e.target.value)
-//                       }
-//                     />
-//                     <input
-//                       type="text"
-//                       value={attr.value}
-//                       placeholder="Value"
-//                       className="form-control mr-2"
-//                       onChange={(e) =>
-//                         handleAttributeChange(index, "value", e.target.value)
-//                       }
-//                     />
+//                 {attributes.map((attr, attrIndex) => (
+//                   <div key={attrIndex} className="mb-2">
+//                     <div className="d-flex mb-2 align-items-center">
+//                       <input
+//                         type="text"
+//                         value={attr.key}
+//                         placeholder="Key"
+//                         className="form-control mr-2"
+//                         style={{ width: "45%" }}
+//                         onChange={(e) =>
+//                           handleAttributeChange(
+//                             attrIndex,
+//                             "key",
+//                             0,
+//                             e.target.value
+//                           )
+//                         }
+//                       />
+//                       <CloseOutlined
+//                         className="ml-2 text-danger"
+//                         style={{ cursor: "pointer", fontSize: "16px" }}
+//                         onClick={() => deleteAttributeField(attrIndex)}
+//                       />
+//                     </div>
+//                     {attr.values.map((valueObj, valueIndex) => (
+//                       <div
+//                         key={valueIndex}
+//                         className="d-flex mb-2 align-items-center"
+//                       >
+//                         <input
+//                           type="text"
+//                           value={valueObj.value}
+//                           placeholder="Value"
+//                           className="form-control mr-2"
+//                           style={{ width: "45%" }}
+//                           onChange={(e) =>
+//                             handleAttributeChange(
+//                               attrIndex,
+//                               "value",
+//                               valueIndex,
+//                               e.target.value
+//                             )
+//                           }
+//                         />
+//                         {valueObj.price !== undefined && (
+//                           <input
+//                             type="text"
+//                             value={valueObj.price}
+//                             placeholder="Price"
+//                             className="form-control ml-2"
+//                             style={{ width: "30%" }}
+//                             onChange={(e) =>
+//                               handleAttributeChange(
+//                                 attrIndex,
+//                                 "value",
+//                                 valueIndex,
+//                                 valueObj.value,
+//                                 e.target.value
+//                               )
+//                             }
+//                           />
+//                         )}
+//                         <CloseOutlined
+//                           className="ml-2 text-danger"
+//                           style={{ cursor: "pointer", fontSize: "16px" }}
+//                           onClick={() =>
+//                             deleteValueField(attrIndex, valueIndex)
+//                           }
+//                         />
+//                       </div>
+//                     ))}
+//                     <button
+//                       className="btn btn-outline-secondary mb-2"
+//                       onClick={() => addValueField(attrIndex)}
+//                     >
+//                       Add Value
+//                     </button>
 //                   </div>
 //                 ))}
 //                 <button
@@ -227,6 +320,7 @@ import toast from "react-hot-toast";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Select } from "antd";
+import { CloseOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
 
@@ -240,7 +334,9 @@ const CreateProduct = () => {
   const [quantity, setQuantity] = useState("");
   const [price, setPrice] = useState("");
   const [shipping, setShipping] = useState("");
-  const [attributes, setAttributes] = useState([{ key: "", values: [""] }]);
+  const [attributes, setAttributes] = useState([
+    { key: "", values: [{ value: "", price: "" }] },
+  ]);
 
   const getAllCategory = async () => {
     try {
@@ -283,23 +379,58 @@ const CreateProduct = () => {
     }
   };
 
-  const handleAttributeChange = (index, key, valueIndex, value) => {
+  const handleAttributeChange = (
+    attrIndex,
+    key,
+    valueIndex,
+    value,
+    price = null
+  ) => {
     const newAttributes = [...attributes];
     if (key === "key") {
-      newAttributes[index].key = value;
+      newAttributes[attrIndex].key = value;
     } else {
-      newAttributes[index].values[valueIndex] = value;
+      if (price !== null) {
+        newAttributes[attrIndex].values[valueIndex].price = price;
+      } else {
+        newAttributes[attrIndex].values[valueIndex].value = value;
+      }
     }
     setAttributes(newAttributes);
   };
 
   const addAttributeField = () => {
-    setAttributes([...attributes, { key: "", values: [""] }]);
+    setAttributes([
+      ...attributes,
+      { key: "", values: [{ value: "", price: "" }] },
+    ]);
   };
 
   const addValueField = (index) => {
     const newAttributes = [...attributes];
-    newAttributes[index].values.push("");
+    newAttributes[index].values.push({ value: "", price: "" });
+    setAttributes(newAttributes);
+  };
+
+  const deleteAttributeField = (attrIndex) => {
+    const newAttributes = [...attributes];
+    newAttributes.splice(attrIndex, 1);
+    setAttributes(newAttributes);
+  };
+
+  const deleteValueField = (attrIndex, valueIndex) => {
+    const newAttributes = [...attributes];
+    newAttributes[attrIndex].values.splice(valueIndex, 1);
+    if (newAttributes[attrIndex].values.length === 0) {
+      newAttributes[attrIndex].values.push({ value: "", price: "" });
+    }
+    setAttributes(newAttributes);
+  };
+
+  const togglePriceField = (attrIndex, valueIndex) => {
+    const newAttributes = [...attributes];
+    newAttributes[attrIndex].values[valueIndex].showPriceField =
+      !newAttributes[attrIndex].values[valueIndex].showPriceField;
     setAttributes(newAttributes);
   };
 
@@ -404,40 +535,103 @@ const CreateProduct = () => {
               </Select>
               <div className="mb-3">
                 <h4>Product Attributes</h4>
-                {attributes.map((attr, index) => (
-                  <div key={index} className="mb-2">
-                    <div className="d-flex mb-2">
+                {attributes.map((attr, attrIndex) => (
+                  <div key={attrIndex} className="mb-2">
+                    <div className="d-flex mb-2 align-items-center">
                       <input
                         type="text"
                         value={attr.key}
                         placeholder="Key"
                         className="form-control mr-2"
+                        style={{ width: "45%" }}
                         onChange={(e) =>
-                          handleAttributeChange(index, "key", 0, e.target.value)
+                          handleAttributeChange(
+                            attrIndex,
+                            "key",
+                            0,
+                            e.target.value
+                          )
                         }
                       />
+                      <CloseOutlined
+                        className="ml-2"
+                        style={{
+                          cursor: "pointer",
+                          fontSize: "16px",
+                          color: "white",
+                          backgroundColor: "red",
+                          borderRadius: "50%",
+                          padding: "2px",
+                        }}
+                        onClick={() => deleteAttributeField(attrIndex)}
+                      />
                     </div>
-                    {attr.values.map((value, valueIndex) => (
-                      <div key={valueIndex} className="d-flex mb-2">
+                    {attr.values.map((valueObj, valueIndex) => (
+                      <div
+                        key={valueIndex}
+                        className="d-flex mb-2 align-items-center"
+                      >
                         <input
                           type="text"
-                          value={value}
+                          value={valueObj.value}
                           placeholder="Value"
                           className="form-control mr-2"
+                          style={{ width: "45%" }}
                           onChange={(e) =>
                             handleAttributeChange(
-                              index,
+                              attrIndex,
                               "value",
                               valueIndex,
                               e.target.value
                             )
                           }
                         />
+                        <button
+                          className="btn btn-outline-secondary mb-2"
+                          onClick={() =>
+                            togglePriceField(attrIndex, valueIndex)
+                          }
+                        >
+                          {valueObj.price === "" ? "Add Price" : "Delete Price"}
+                        </button>
+                        {valueObj.price !== undefined &&
+                          valueObj.showPriceField && (
+                            <input
+                              type="text"
+                              value={valueObj.price}
+                              placeholder="Price"
+                              className="form-control ml-2"
+                              style={{ width: "30%" }}
+                              onChange={(e) =>
+                                handleAttributeChange(
+                                  attrIndex,
+                                  "value",
+                                  valueIndex,
+                                  valueObj.value,
+                                  e.target.value
+                                )
+                              }
+                            />
+                          )}
+                        <CloseOutlined
+                          className="ml-2"
+                          style={{
+                            cursor: "pointer",
+                            fontSize: "16px",
+                            color: "white",
+                            backgroundColor: "red",
+                            borderRadius: "50%",
+                            padding: "2px",
+                          }}
+                          onClick={() =>
+                            deleteValueField(attrIndex, valueIndex)
+                          }
+                        />
                       </div>
                     ))}
                     <button
                       className="btn btn-outline-secondary mb-2"
-                      onClick={() => addValueField(index)}
+                      onClick={() => addValueField(attrIndex)}
                     >
                       Add Value
                     </button>

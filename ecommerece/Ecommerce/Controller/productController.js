@@ -16,76 +16,6 @@ var gateway = new braintree.BraintreeGateway({
   privateKey: process.env.BRAINTREE_PRIVATE_KEY,
 });
 
-// export const CreateProductController = async (req, res) => {
-//   try {
-//     const {
-//       name,
-//       slug,
-//       description,
-//       price,
-//       category,
-//       quantity,
-//       shipping,
-//       attributes, // This is a JSON string
-//     } = req.fields;
-//     const { photo } = req.files;
-
-//     // Parse the attribute field
-//     let parsedAttributes = [];
-//     if (attributes) {
-//       try {
-//         parsedAttributes = JSON.parse(attributes);
-//       } catch (error) {
-//         return res.status(400).send({ error: "Invalid attribute format" });
-//       }
-//     }
-
-//     // Validation
-//     switch (true) {
-//       case !name:
-//         return res.status(500).send({ error: "Name is Required" });
-//       case !description:
-//         return res.status(500).send({ error: "Description is Required" });
-//       case !price:
-//         return res.status(500).send({ error: "Price is Required" });
-//       case !category:
-//         return res.status(500).send({ error: "Category is Required" });
-//       case !quantity:
-//         return res.status(500).send({ error: "Quantity is Required" });
-//       case photo && photo.size > 1000000:
-//         return res
-//           .status(500)
-//           .send({ error: "Photo is Required and should be less than 1MB" });
-//     }
-
-//     const products = new ProductModel({
-//       ...req.fields,
-//       slug: slugify(name),
-//       attributes: parsedAttributes, // Set the parsed attributes
-//     });
-
-//     if (photo) {
-//       products.photo.data = fs.readFileSync(photo.path);
-//       products.photo.contentType = photo.type;
-//     }
-
-//     await products.save();
-//     res.status(200).send({
-//       success: true,
-//       message: "Product Created Successfully",
-//       products,
-//     });
-//   } catch (error) {
-//     console.log(error);
-//     res.status(500).send({
-//       success: false,
-//       message: "Error in Creating Product",
-//       error,
-//     });
-//   }
-// };
-//get all products
-
 export const CreateProductController = async (req, res) => {
   try {
     const {
@@ -96,7 +26,7 @@ export const CreateProductController = async (req, res) => {
       category,
       quantity,
       shipping,
-      attributes, // This is a JSON string
+      attributes,
     } = req.fields;
     const { photo } = req.files;
 

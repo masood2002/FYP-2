@@ -111,7 +111,7 @@ const HomePage = () => {
       <div className="row mt-3 ml-5">
         <div className="col-md-2 d-flex flex-column align-items-center">
           <h6 className="text-center">Filter By Category</h6>
-          <div className="d-flex flex-column align-items-center">
+          <div className="d-flex flex-column align-items-baseline">
             {categories.map((c) => (
               <Checkbox
                 key={c._id}
