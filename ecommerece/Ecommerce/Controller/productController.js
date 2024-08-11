@@ -292,73 +292,17 @@ export const updateProductController = async (req, res) => {
 
 // export const productFiltersController = async (req, res) => {
 //   try {
-//     const { checked, radio } = req.body;
-//     let args = {};
-//     if (checked.length > 0) args.category = checked;
-//     if (radio.length) args.price = { $gte: radio[0], $lte: radio[1] };
-//     const products = await ProductModel.find(args);
-//     res.status(200).send({
-//       success: true,
-//       products,
-//     });
-//   } catch (error) {
-//     console.log(error);
-//     res.status(400).send({
-//       success: false,
-//       message: "Error WHile Filtering Products",
-//       error,
-//     });
-//   }
-// };
-// export const productFiltersController = async (req, res) => {
-//   try {
-//     // Extract and validate the filters
-//     const { checked = [], radio = [] } = req.body;
-
-//     // Ensure `checked` and `radio` are arrays
-//     if (!Array.isArray(checked)) {
-//       return res.status(400).send({
-//         success: false,
-//         message: "Checked categories should be an array.",
-//       });
-//     }
-
-//     if (!Array.isArray(radio)) {
-//       return res.status(400).send({
-//         success: false,
-//         message: "Price range should be an array.",
-//       });
-//     }
-
-//     // Prepare filter arguments
-//     let args = {};
-//     if (checked.length > 0) args.category = { $in: checked };
-//     if (radio.length === 2) args.price = { $gte: radio[0], $lte: radio[1] };
-
-//     // Fetch filtered products
-//     const products = await ProductModel.find(args);
-//     res.status(200).send({
-//       success: true,
-//       products,
-//     });
-//   } catch (error) {
-//     console.error("Error in productFiltersController:", error);
-//     res.status(500).send({
-//       success: false,
-//       message: "Error while filtering products.",
-//       error,
-//     });
-//   }
-// };
-// export const productFiltersController = async (req, res) => {
-//   try {
 //     // Ensure checked and radio have default values
 //     const checked = req.body.checked || [];
 //     const radio = req.body.radio || [];
 
 //     let args = {};
-//     if (checked.length > 0) args.category = { $in: checked };
-//     if (radio.length === 2) args.price = { $gte: radio[0], $lte: radio[1] };
+//     if (checked.length > 0) {
+//       args.category = { $in: checked }; // Filters by categories
+//     }
+//     if (radio.length === 2) {
+//       args.price = { $gte: radio[0], $lte: radio[1] }; // Filters by price range
+//     }
 
 //     const products = await ProductModel.find(args);
 
@@ -370,7 +314,7 @@ export const updateProductController = async (req, res) => {
 //       }
 //       return product;
 //     });
-
+//     console.log(productsWithImages);
 //     res.status(200).send({
 //       success: true,
 //       products: productsWithImages,
@@ -386,7 +330,6 @@ export const updateProductController = async (req, res) => {
 // };
 export const productFiltersController = async (req, res) => {
   try {
-    // Ensure checked and radio have default values
     const checked = req.body.checked || [];
     const radio = req.body.radio || [];
 
@@ -398,9 +341,8 @@ export const productFiltersController = async (req, res) => {
       args.price = { $gte: radio[0], $lte: radio[1] }; // Filters by price range
     }
 
-    const products = await ProductModel.find(args);
+    const products = await ProductModel.find(args).lean(); // Use lean() to get plain JavaScript objects
 
-    // Convert buffer to base64 string
     const productsWithImages = products.map((product) => {
       if (product.photo && product.photo.data) {
         const base64 = Buffer.from(product.photo.data).toString("base64");
